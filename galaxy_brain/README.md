@@ -2,7 +2,14 @@
 
 A 3D interactive knowledge graph visualization plugin for Hermes Agent, bringing your Obsidian vault to life as a navigable 3D constellation of notes and tags.
 
-![GalaxyBrain](https://github.com/nerd-sniped/GalaxyBrain/raw/main/public/graph-preview.svg)
+![GalaxyBrain](https://github.com/ohrbit/hermes_plugins/blob/main/galaxy_brain/docs/images/hero.jpg)
+
+## Human Notes
+This is entierly written by nemotron3-ultra:free with the hermes-agent harness and slight customiziation but basicly out of the box via telegram chat.
+i actually have no idea what im doing and the process workflow was so lala, 3h to create it, 1 bug and we went on a 18h library hunt.. part my fault, i could have used versioning and roll back but yeah, in the end its working. some features have bugs and are not working and i dont think the model will be able to do it in time.
+ive contacted both of the original authors maybe they want to create a proper version of the plugin with all the fancy features of the original galaxy brain.
+
+im currently testing googles new [okf](https://github.com/GoogleCloudPlatform/knowledge-catalog/tree/main/okf) integration
 
 ## Features
 
