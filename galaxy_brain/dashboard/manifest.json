@@ -1,0 +1,16 @@
+{
+  "name": "galaxy-brain",
+  "label": "GalaxyBrain",
+  "description": "3D interactive knowledge graph for Obsidian vaults",
+  "icon": "Globe",
+  "version": "1.0.0",
+  "tab": {
+    "path": "/galaxy-brain",
+    "position": "after:skills"
+  },
+  "entry": "plugin.js",
+  "css": null,
+  "api": "api.py",
+  "has_api": true,
+  "source": "user"
+}

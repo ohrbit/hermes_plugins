@@ -1,0 +1,20 @@
+name: galaxy-brain
+version: "1.0.0"
+description: "3D interactive knowledge graph visualization for Obsidian vaults — GalaxyBrain integration for Hermes dashboard"
+author: nerd-sniped (adapted for Hermes)
+license: MIT
+homepage: https://github.com/nerd-sniped/GalaxyBrain
+tags:
+  - obsidian
+  - knowledge-graph
+  - 3d-visualization
+  - galaxy-brain
+  - dashboard
+provides_tools: []
+dependencies: []
+requires_env: []
+dashboard:
+  label: GalaxyBrain
+  icon: Globe
+  path: /galaxy-brain
+  position: after:skills
