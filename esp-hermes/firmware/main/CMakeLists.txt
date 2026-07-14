@@ -2,10 +2,12 @@
 idf_component_register(
     SRCS
         "esp_hermes_client.c"
+        "esp_hermes.c"
         "nvs_config.c"
         "capabilities.c"
         "audio_capture.c"
         "audio_play.c"
+        "audio_codec.c"
         "lcd_pet.c"
         "lcd_tui.c"
         "imu_motion.c"

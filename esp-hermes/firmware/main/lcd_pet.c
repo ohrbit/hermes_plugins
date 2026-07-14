@@ -8,6 +8,7 @@
 #include "lcd_pet.h"
 #include <string.h>
 #include "esp_log.h"
+#include "esp_heap_caps.h"
 
 static const char *TAG = "eh_lcd_pet";
 static bool       s_init = false;

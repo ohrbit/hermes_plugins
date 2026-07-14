@@ -8,6 +8,7 @@
 #include "audio_play.h"
 #include <string.h>
 #include <math.h>
+#include <stdlib.h>
 #include "esp_log.h"
 #include "driver/i2s.h"
 
