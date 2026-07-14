@@ -1,0 +1,7 @@
+# Name,   Type, SubType, Offset,   Size,     Flags
+# Default bootloader/partition table are injected by the build; we only define
+# the app + a data partition for pet sprites / cached audio / NVS.
+nvs,      data, nvs,     0x9000,   0x6000,
+phy_init, data, phy,     0xf000,   0x1000,
+factory,  app,  factory, 0x10000,  0x1A0000,
+storage,  data, fat,     0x1B0000, 0x250000,

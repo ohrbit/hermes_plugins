@@ -1,0 +1,26 @@
+# esp_hermes.yaml — sample config (merge into ~/.hermes/config.yaml)
+# Full reference: ../references/implementation-spec.md §8, §17
+#
+# SECURITY: this file contains NO secrets. The real per-device `device_token`
+# is injected at runtime (gateway API), never committed.
+
+esp_hermes:
+  devices:
+    stick-s3:
+      allowed_pins: [12, 13, 14, 36]          # only these are callable
+      allowed_i2c: [0x40, 0x68]                # sensor addresses only
+      blocked_pins: [0, 1, 2, 3]               # boot/flash/UART0 never exposed
+      auto_approve_safe: false                 # destructive IO prompts user
+      rate_limit: { gpio_set: 5/s, pwm_set: 5/s }
+  gestures:
+    shake: toggle_mode
+    tap: ptt_trigger
+    flip: wake
+    # user-mappable task triggers (Phase 4):
+    # double_tap_tilt: task:summarize_day
+    # figure8: task:status_ping
+  easter_eggs:
+    secret_shake: pet_dance
+    upside_down_3s: pet_sleep
+    rapid_3x_tap: surprise
+  audio_cues: true

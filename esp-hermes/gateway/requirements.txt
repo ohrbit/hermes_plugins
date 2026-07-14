@@ -1,0 +1,4 @@
+# WS hub deps. The Hermes gateway already pulls aiohttp, so no extra install
+# is required in a normal deployment. websockets is listed for completeness
+# (used by other platforms) but is NOT required by esp_hermes_ws.
+aiohttp>=3.8

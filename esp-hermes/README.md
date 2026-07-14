@@ -49,14 +49,20 @@ LLM client — Hermes is the brain.
 
 ```
 esp-hermes/
+├── plugin.yaml       # Hermes plugin manifest (kind: platform)
+├── __init__.py       # plugin entry point → register()
 ├── gateway/          # Hermes-side adapter (Python)
-│   └── esp_hermes.py # BasePlatformAdapter subclass + WS hub
+│   ├── esp_hermes.py     # ✅ EspHermesAdapter (BasePlatformAdapter subclass)
+│   └── esp_hermes_ws.py  # ✅ WS hub + pet-state push (delivered, self-contained)
 ├── tools/            # IO-tool handlers (Python)
 │   └── esp_io.py     # esp_gpio_set, esp_i2c_read, esp_imu_read, ...
-├── firmware/         # ESP32-S3 client (C/ESP-IDF)
-│   └── main/         # WS client, audio, lcd_pet, lcd_tui, imu, io_tools
+├── firmware/         # ESP32-S3 client (C/ESP-IDF) — DRAFT until hardware
+│   └── README.md     # fork plan, build steps, file map
 ├── config/           # config.yaml snippets (allowlist, gestures)
+│   └── esp_hermes.yaml   # sample (no secrets)
+├── tests/            # adapter unit tests (real WSHub, no hardware)
 └── references/       # Full implementation spec (protocol, phases)
+    └── implementation-spec.md
 ```
 
 ## Quick Start (when hardware arrives)

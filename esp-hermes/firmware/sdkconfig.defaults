@@ -1,0 +1,40 @@
+# sdkconfig.defaults — ESP-Hermes firmware (ESP32-S3)
+#
+# DRAFT defaults. Pinned for the M5Stack Stick-S3 / Core-S3 family.
+# Tune after hardware arrives (PSRAM, codec, LCD driver per board).
+
+CONFIG_IDF_TARGET="esp32s3"
+
+# Flash size / partition scheme (see partitions.csv)
+CONFIG_PARTITION_TABLE_CUSTOM=y
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions.csv"
+CONFIG_FATFS_VOLUME_LABEL="esp_hermes"
+
+# WiFi
+CONFIG_ESP_WIFI_SSID=""
+CONFIG_ESP_WIFI_PASSWORD=""
+CONFIG_ESP_WIFI_SOFTAP_SSID=""
+
+# WebSocket (component "esp-websocket-client") over TLS
+CONFIG_ESP_TLS_INSECURE=y
+# NOTE (spec §17): in production set CONFIG_ESP_TLS_INSECURE=n and pin the
+# gateway cert fingerprint. Insecure is for early bring-up behind a tunnel.
+
+# PSRAM (Stick-S3 has 8MB; needed for audio buffers + video bursts)
+CONFIG_SPIRAM=y
+CONFIG_SPIRAM_MODE_QUAD=y
+CONFIG_SPIRAM_USE_MALLOC=y
+
+# Main task stack (audio + WS coexist)
+CONFIG_ESP_MAIN_TASK_STACK_SIZE=36864
+
+# FreeRTOS
+CONFIG_FREERTOS_HZ=1000
+CONFIG_FREERTOS_UNICORE=n
+
+# Logging
+CONFIG_LOG_DEFAULT_LEVEL=INFO
+CONFIG_LOG_COLORS=y
+
+# NVS
+CONFIG_NVS_ENCRYPTION=n

@@ -1,0 +1,33 @@
+name: esp-hermes
+label: ESP32-S3 (M5Stack)
+kind: platform
+version: 0.1.0
+description: >-
+  Turn an M5Stack ESP32-S3 into a first-class Hermes voice/IO channel.
+  Hermes (gateway) is the brain; the ESP is a thin physical WebSocket client.
+  Provides a BasePlatformAdapter that routes inbound audio/events/imu into
+  per-device Hermes sessions and delivers agent responses as TTS audio + a
+  live petdex pet-state to the device LCD. Full hardware access (GPIO/I2C/
+  PWM/IMU) via tool-calls. Not a standalone agent.
+
+  Key principle: ESP is a gateway client, not an LLM client (do NOT use
+  ESP-Claw's LLM mode). Reuse ESP-Claw's hardware layer; strip its LLM client.
+author: ohrbit
+requires_env: []
+optional_env:
+  - name: ESP_HERMES_WS_PATH
+    description: "WS route path the devices connect to (default: /api/esp_hermes/ws)"
+    prompt: "ESP WS path"
+    password: false
+  - name: ESP_HERMES_TTS_VOICE
+    description: "TTS voice for agent replies spoken on the device speaker"
+    prompt: "TTS voice"
+    password: false
+  - name: ESP_HERMES_PET
+    description: "petdex pet slug shown on the device LCD (idle/run/done/...)"
+    prompt: "pet slug"
+    password: false
+  - name: ESP_HERMES_DEFAULT_DEVICE
+    description: "default device_id for proactive pushes (cron/alerts) when none given"
+    prompt: "default device id"
+    password: false
