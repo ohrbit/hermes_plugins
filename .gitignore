@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+build/
+dist/
+
+# ESP-IDF (firmware/ — once real code lands)
+sdkconfig
+sdkconfig.old
+build/
+.fatfs/
+components/*/build/
+
+# Secrets / local state — NEVER commit
+.env
+*.db
+kanban.db
+secrets.yaml
+credentials.json
+*.pem
+*.key
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+*.swp
