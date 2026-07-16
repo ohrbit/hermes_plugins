@@ -1,7 +1,7 @@
 # main/CMakeLists.txt — registers the esp_hermes_client component sources.
 # Note (ESP-IDF v5+): esp_websocket_client is pulled via idf_component.yml
-# (Component Manager), NOT listed in REQUIRES here. ledc/uart live inside
-# the `driver` component, so they are not separate REQUIRES entries.
+# (Component Manager). i2c/ledc/uart/spi_flash live inside `driver`, so they
+# are NOT separate REQUIRES entries. esp_adc is its own component (esp_adc/...).
 idf_component_register(
     SRCS
         "esp_hermes_client.c"
@@ -23,8 +23,6 @@ idf_component_register(
         nvs_flash
         esp-tls
         esp_adc
-        i2c
-        spi_flash
         fatfs
         json
 )
