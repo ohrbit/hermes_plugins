@@ -1,7 +1,9 @@
 # ESP-Hermes firmware dependencies (ESP-IDF Component Manager).
-# In v5+ `esp_websocket_client` moved out of the core IDF into the registry;
-# the manager fetches it automatically at cmake time.
+# In v5+ esp_websocket_client moved out of core IDF into the registry.
+# In v6.0 the built-in `json` (cJSON) component was REMOVED entirely —
+# use espressif/cjson from the registry instead.
 dependencies:
   esp_websocket_client:
     version: "^1.0.0"
-  # json (cJSON) is in core IDF, no entry needed.
+  espressif/cjson:
+    version: "^1.0.0"
