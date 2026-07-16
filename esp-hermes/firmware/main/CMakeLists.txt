@@ -24,7 +24,6 @@ idf_component_register(
         esp-tls
         esp_adc
         fatfs
-        json
 )
 
 # Audio codec (Opus vs PCM) — spec §11. Default PCM (no external lib yet).
