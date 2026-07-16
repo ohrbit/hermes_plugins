@@ -69,10 +69,37 @@ esp-hermes/
 ## Installation
 
 Two parts: the **Hermes gateway plugin** (Python, install on your server) and
-the **ESP32 firmware** (C/ESP-IDF, flash to the device). Do the gateway side
-first — it works without hardware (tests run headless).
+the **ESP32 firmware** (C/ESP-IDF, flash to the device).
 
-### Prerequisites
+> **TL;DR for agents:** to install the gateway side, just run
+> `hermes plugins install https://github.com/ohrbit/hermes_plugins` — Hermes
+> clones the whole collection repo, then auto-discovers `esp-hermes/plugin.yaml`
+> inside it and registers the `esp_hermes` platform. Enable + restart, done.
+> No manual file copying, no need to cd into the subdir.
+
+There are two install paths:
+
+### A. Agent / one-command install (recommended for Hermes users)
+
+Give your agent (or yourself) the GitHub URL — Hermes handles the rest:
+
+```bash
+# Hermes discovers esp-hermes/plugin.yaml inside the collection repo and installs it
+hermes plugins install https://github.com/ohrbit/hermes_plugins
+hermes plugins enable esp-hermes          # or: --enable at install time
+hermes config set gateway.platforms.esp_hermes.enabled true
+hermes gateway restart
+```
+
+That's it — the adapter, WS hub, and IO tools are live. Verify with
+`hermes gateway status` (no tracebacks) and
+`hermes plugins list | grep esp_hermes`.
+
+### B. Manual / human install (explicit, no agent)
+
+For environments where you want full control or no plugin auto-discovery:
+
+**Prerequisites**
 
 | Component | Version / Link | Notes |
 |---|---|---|
@@ -82,7 +109,7 @@ first — it works without hardware (tests run headless).
 | Git | any | to clone the plugin repo |
 | M5Stack ESP32-S3 | [product page](https://m5stack.com/products/esp32-s3-stick) | hardware; arrives separately |
 
-### Part 1 — Gateway Plugin (Hermes side)
+**Part 1 — Gateway Plugin (Hermes side, manual)**
 
 ```bash
 # 1. Clone the plugin collection and enter the subdir
@@ -93,8 +120,7 @@ cd hermes_plugins/esp-hermes
 pip install -r gateway/requirements.txt
 #    (pulls: websockets, pydantic — see gateway/requirements.txt)
 
-# 3. Register the plugin with Hermes
-#    Copy the plugin folder into your Hermes plugins dir, then enable it:
+# 3. Register the plugin with Hermes (copy or symlink into plugins dir)
 hermes plugins install ./esp-hermes        # or symlink into ~/.hermes/plugins/
 hermes config set gateway.platforms.esp_hermes.enabled true
 
@@ -115,7 +141,7 @@ hermes plugins list | grep esp_hermes
 > the adapter routes audio/events into a session. See
 > [gateway/README.md](gateway/README.md) for the test matrix.
 
-### Part 2 — ESP32 Firmware (device side)  🔄 DRAFT
+**Part 2 — ESP32 Firmware (device side)  🔄 DRAFT**
 
 > ⚠️ **Status:** the firmware is drafted but **not yet built or flashed** — no
 > ESP32-S3 was available during development. The steps below are the intended
@@ -131,7 +157,7 @@ cd esp-hermes/firmware
 idf.py set-target esp32s3
 idf.py build
 
-# 3. Flash + monitor (device on /dev/ttyUSB0)
+# 3. Flash + monitor (device on /dev/ttyUSB0; hold reset to enter download mode)
 idf.py flash monitor
 
 # 4. On first boot, the device opens an AP / expects WiFi creds via NVS.
