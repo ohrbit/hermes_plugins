@@ -143,26 +143,19 @@ hermes plugins list | grep esp_hermes
 
 **Part 2 — ESP32 Firmware (device side)  🔄 DRAFT**
 
-> ⚠️ **Status:** the firmware is drafted but **not yet built or flashed** — no
-> ESP32-S3 was available during development. The steps below are the intended
-> flow; treat them as pending verification. Full detail in
-> [firmware/README.md](firmware/README.md).
+> ⚠️ **Status:** the firmware is drafted but **not yet built or flashed** on
+> real hardware. Full step-by-step beginner guide (what ESP-IDF is, install,
+> download mode, troubleshooting) is in
+> [firmware/README.md](firmware/README.md) — **read that if you have never
+> used Espressif tools.**
 
 ```bash
-# 1. Install ESP-IDF (see link above), then export it:
+# Quick path (if ESP-IDF already in PATH):
 . $HOME/esp/esp-idf/export.sh
-
-# 2. Build the firmware
 cd esp-hermes/firmware
 idf.py set-target esp32s3
 idf.py build
-
-# 3. Flash + monitor (device on /dev/ttyUSB0; hold reset to enter download mode)
-idf.py flash monitor
-
-# 4. On first boot, the device opens an AP / expects WiFi creds via NVS.
-#    Set them once:  (exact mechanism TBD in firmware/README.md)
-#    hermes config set esp_hermes.devices.stick-s3.wifi "SSID:password"
+idf.py flash monitor     # hold reset to enter download mode
 ```
 
 References for the firmware base:
