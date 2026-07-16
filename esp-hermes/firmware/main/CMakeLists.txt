@@ -1,7 +1,11 @@
 # main/CMakeLists.txt — registers the esp_hermes_client component sources.
+# Note (ESP-IDF v5+): esp_websocket_client is pulled via idf_component.yml
+# (Component Manager), NOT listed in REQUIRES here. ledc/uart live inside
+# the `driver` component, so they are not separate REQUIRES entries.
 idf_component_register(
     SRCS
         "esp_hermes_client.c"
+        "esp_hermes.c"
         "nvs_config.c"
         "capabilities.c"
         "audio_capture.c"
@@ -17,7 +21,6 @@ idf_component_register(
         esp_wifi
         esp_netif
         nvs_flash
-        esp_websocket_client
         esp-tls
         esp_adc
         i2c
@@ -26,8 +29,5 @@ idf_component_register(
         json
 )
 
-# DRAFT: the opus codec dependency is not yet wired. When hardware arrives and
-# the codec decision (spec §11: Opus vs PCM) is made, add either:
-#   - a vendored libopus static lib (prebuilt for xtensa/riscv), or
-#   - a component pulling libopus via `idf_component.yml`.
-# Until then audio_capture/audio_play compile but encode/decode are stubbed.
+# Audio codec (Opus vs PCM) — spec §11. Default PCM (no external lib yet).
+# To use Opus: add a prebuilt libopus component or idf_component.yml dep.
