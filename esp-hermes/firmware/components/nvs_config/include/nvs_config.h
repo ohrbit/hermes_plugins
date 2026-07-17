@@ -21,6 +21,9 @@ extern "C" {
 #define EH_NVS_KEY_PET     "pet_slug"
 #define EH_NVS_KEY_DISPLAY "display"     /* "pet" | "tui" */
 #define EH_NVS_KEY_MUTE    "mute"
+#define EH_NVS_KEY_WIFI_SSID "wifi_ssid"
+#define EH_NVS_KEY_WIFI_PASS "wifi_pass"
+#define EH_NVS_KEY_BACKEND "backend"
 
 /* Runtime config blob (loaded from NVS at boot). */
 typedef struct {
@@ -28,6 +31,9 @@ typedef struct {
     char token[EH_TOKEN_MAX];
     char gateway_host[128];
     char pet_slug[32];
+    char wifi_ssid[64];
+    char wifi_pass[64];
+    char backend[16];        /* "claw" = local, "hermes" = gateway */
     eh_mode_t     mode;
     bool          display_tui;   /* false -> pet mode, true -> TUI mode */
     bool          muted;         /* audio cues off */
@@ -46,6 +52,8 @@ esp_err_t eh_nvs_save_mute(bool muted);
 esp_err_t eh_nvs_save_pet(const char *slug);
 esp_err_t eh_nvs_save_device(const char *device_id, const char *token,
                              const char *gateway_host);
+/* Persist the whole config blob (used by the web config server). */
+esp_err_t eh_nvs_save(const eh_config_t *cfg);
 
 #ifdef __cplusplus
 }

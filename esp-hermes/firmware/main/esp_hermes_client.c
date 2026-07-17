@@ -34,6 +34,9 @@
 #include "lcd_viz.h"
 #include "imu_motion.h"
 #include "io_tools.h"
+#include "wifi_manager.h"
+#include "captive_dns.h"
+#include "web_config.h"
 
 static const char *TAG = "esp_hermes_client";
 
@@ -184,27 +187,67 @@ void app_main(void)
     io_tools_init();
     eh_lcd_pet_render(EH_PET_IDLE, 0, 0);
 
-    wifi_init_sta(EH_WIFI_SSID, EH_WIFI_PASS);
+    wifi_manager_init();
+
+    bool have_wifi = (cfg.wifi_ssid[0] != '\0');
+    if (!have_wifi) {
+        /* Provisioning mode: SoftAP + internal web config server. */
+        ESP_LOGI(TAG, "No WiFi configured -> provisioning mode (SoftAP + web UI)");
+        wifi_manager_config_t wcfg = { .ap_ssid_prefix = "esp-hermes", .ap_behavior = "keep" };
+        ESP_ERROR_CHECK(wifi_manager_start(&wcfg));
+        ESP_ERROR_CHECK(eh_web_config_start());
+        /* Captive portal: redirect all DNS to our UI. */
+        captive_dns_config_t cdns = {
+            .ap_netif = wifi_manager_get_ap_netif(),
+            .redirect_ip = 0,            /* 0 -> use AP IP */
+            .configure_dhcp_dns = true,
+        };
+        captive_dns_start(&cdns);
+        /* Stay in provisioning until the user saves WiFi via the UI
+         * (web_config POST applies STA config + restarts). */
+        xEventGroupWaitBits(s_wifi_event_group, EH_WIFI_CONNECTED_BIT,
+                            pdFALSE, pdTRUE, portMAX_DELAY);
+    } else {
+        ESP_ERROR_CHECK(eh_web_config_start());   /* also reachable on STA iface */
+    }
+
+    wifi_manager_config_t wcfg = {
+        .sta_ssid = cfg.wifi_ssid,
+        .sta_password = cfg.wifi_pass[0] ? cfg.wifi_pass : NULL,
+        .ap_ssid_prefix = "esp-hermes",
+        .ap_behavior = "keep",
+    };
+    ESP_ERROR_CHECK(wifi_manager_start(&wcfg));
     xEventGroupWaitBits(s_wifi_event_group, EH_WIFI_CONNECTED_BIT,
                         pdFALSE, pdTRUE, portMAX_DELAY);
 
-    char uri[512];
-    snprintf(uri, sizeof(uri), "wss://%s%s?device_id=%s&token=%s",
-             cfg.gateway_host, EH_WS_PATH, cfg.device_id, cfg.token);
-    esp_websocket_client_config_t ws_cfg = {
-        .uri = uri, .reconnect_timeout_ms = EH_RECONNECT_MIN_MS,
-        .task_stack = 8 * 1024,
-    };
-    s_ws = esp_websocket_client_init(&ws_cfg);
-    ESP_ERROR_CHECK(esp_websocket_register_events(s_ws, WEBSOCKET_EVENT_ANY,
-                                                   ws_event_handler, NULL));
-    ESP_ERROR_CHECK(esp_websocket_client_start(s_ws));
+    /* Backend selection: Hermes Gateway vs local Claw. */
+    if (strcmp(cfg.backend, "hermes") == 0) {
+        char uri[512];
+        snprintf(uri, sizeof(uri), "wss://%s%s?device_id=%s&token=%s",
+                 cfg.gateway_host, EH_WS_PATH, cfg.device_id, cfg.token);
+        esp_websocket_client_config_t ws_cfg = {
+            .uri = uri, .reconnect_timeout_ms = EH_RECONNECT_MIN_MS,
+            .task_stack = 8 * 1024,
+        };
+        s_ws = esp_websocket_client_init(&ws_cfg);
+        ESP_ERROR_CHECK(esp_websocket_register_events(s_ws, WEBSOCKET_EVENT_ANY,
+                                                       ws_event_handler, NULL));
+        ESP_ERROR_CHECK(esp_websocket_client_start(s_ws));
+        ESP_LOGI(TAG, "Backend=hermes, gateway=%s", cfg.gateway_host);
+    } else {
+        /* Local Claw agent (esp-claw framework) — voice loop runs on-device.
+         * WS gateway is not used; voice is handled by cap_hermes/local agent. */
+        ESP_LOGI(TAG, "Backend=claw (local agent)");
+        s_ws = NULL;
+    }
 
     xTaskCreate(eh_heartbeat_task, "eh_hb", 4 * 1024, s_ws, 5, NULL);
     xTaskCreate(imu_motion_task, "imu_task", 6 * 1024, s_ws, 5, NULL);
     xTaskCreate(eh_button_task, "eh_btn", 4 * 1024, s_ws, 5, NULL);
     xTaskCreate(eh_viz_task, "eh_viz", 4 * 1024, NULL, 4, NULL);
 
-    ESP_LOGI(TAG, "ESP-Hermes ready (mode=%s)",
-             s_mode == EH_MODE_PTT ? "ptt" : "vad");
+    ESP_LOGI(TAG, "ESP-Hermes ready (mode=%s, backend=%s)",
+             s_mode == EH_MODE_PTT ? "ptt" : "vad",
+             cfg.backend[0] ? cfg.backend : "claw");
 }

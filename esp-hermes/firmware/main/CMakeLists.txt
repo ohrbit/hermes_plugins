@@ -6,7 +6,6 @@ idf_component_register(
     SRCS
         "esp_hermes_client.c"
         "esp_hermes.c"
-        "nvs_config.c"
         "capabilities.c"
         "audio_capture.c"
         "audio_play.c"
@@ -33,6 +32,11 @@ idf_component_register(
         esp_driver_i2s
         esp_lcd
         esp_driver_spi
+        wifi_manager
+        captive_dns
+        web_config
+        nvs_config
+        esp_hermes_common
 )
 
 # Audio codec (Opus vs PCM) — spec §11. Default PCM (no external lib yet).
