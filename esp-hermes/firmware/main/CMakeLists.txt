@@ -12,6 +12,7 @@ idf_component_register(
         "audio_play.c"
         "lcd_pet.c"
         "lcd_tui.c"
+        "lcd_viz.c"
         "imu_motion.c"
         "io_tools.c"
     INCLUDE_DIRS
@@ -30,6 +31,8 @@ idf_component_register(
         esp_driver_i2c
         esp_driver_uart
         esp_driver_i2s
+        esp_lcd
+        esp_driver_spi
 )
 
 # Audio codec (Opus vs PCM) — spec §11. Default PCM (no external lib yet).

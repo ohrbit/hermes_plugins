@@ -23,6 +23,9 @@ esp_err_t eh_audio_capture_init(void);
 esp_err_t eh_audio_capture_start(void);
 esp_err_t eh_audio_capture_stop(void);
 
+/* True while a capture session is running (PTT held / VAD active). */
+bool eh_audio_capture_running(void);
+
 /*
  * Pull up to `capacity` int16 samples (mono). Returns number of samples read
  * (0 if none available) or <0 on error. Caller encodes + ships upstream.

@@ -45,6 +45,9 @@ esp_err_t eh_lcd_pet_set_frame(eh_pet_state_t state,
  * offsets in pixels (smoothly interpolated by caller). */
 esp_err_t eh_lcd_pet_render(eh_pet_state_t state, int pose_x, int pose_y);
 
+/* Blit an RGB565 bitmap into a sub-rectangle (used by the visualizer). */
+esp_err_t eh_lcd_blit_rect(int x, int y, int w, int h, const uint8_t *rgb565);
+
 /* Optional decoded video burst (RGB565 frames). TODO(hw): real GIF/MJPEG
  * decoder; for the draft we accept a single pre-decoded RGB565 buffer. */
 esp_err_t eh_lcd_pet_play_burst(const uint8_t *rgb565, size_t len, uint32_t ms);

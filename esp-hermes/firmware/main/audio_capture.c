@@ -73,6 +73,10 @@ esp_err_t eh_audio_capture_stop(void) {
     return i2s_channel_disable(s_rx_chan);
 }
 
+bool eh_audio_capture_running(void) {
+    return s_running;
+}
+
 int eh_audio_capture_read(int16_t *buf, int capacity) {
     if (!s_running || !buf || capacity <= 0) return -1;
     size_t bytes_read = 0;

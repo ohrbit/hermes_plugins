@@ -31,6 +31,7 @@
 #include "audio_play.h"
 #include "lcd_pet.h"
 #include "lcd_tui.h"
+#include "lcd_viz.h"
 #include "imu_motion.h"
 #include "io_tools.h"
 
@@ -88,6 +89,20 @@ static void eh_button_task(void *arg)
     /* TODO(esp-hermes): poll KEY1/KEY2 (G11/G12), drive PTT / mode toggle. */
     (void)arg;
     for (;;) vTaskDelay(pdMS_TO_TICKS(1000));
+}
+
+/* ---- Live audio visualizer task ---------------------------------------- */
+static void eh_viz_task(void *arg)
+{
+    (void)arg;
+    int16_t buf[256];
+    for (;;) {
+        if (eh_audio_capture_running()) {
+            int n = eh_audio_capture_read(buf, 256);
+            if (n > 0) eh_lcd_viz_update(buf, n);
+        }
+        vTaskDelay(pdMS_TO_TICKS(20));   /* ~50 fps cap */
+    }
 }
 
 static void wifi_event_handler(void *arg, esp_event_base_t base,
@@ -162,6 +177,7 @@ void app_main(void)
 
     ESP_ERROR_CHECK(eh_lcd_pet_init());
     ESP_ERROR_CHECK(eh_lcd_tui_init());
+    eh_lcd_viz_init();
     ESP_ERROR_CHECK(eh_audio_capture_init());
     ESP_ERROR_CHECK(eh_audio_play_init());
     imu_motion_init();
@@ -187,6 +203,7 @@ void app_main(void)
     xTaskCreate(eh_heartbeat_task, "eh_hb", 4 * 1024, s_ws, 5, NULL);
     xTaskCreate(imu_motion_task, "imu_task", 6 * 1024, s_ws, 5, NULL);
     xTaskCreate(eh_button_task, "eh_btn", 4 * 1024, s_ws, 5, NULL);
+    xTaskCreate(eh_viz_task, "eh_viz", 4 * 1024, NULL, 4, NULL);
 
     ESP_LOGI(TAG, "ESP-Hermes ready (mode=%s)",
              s_mode == EH_MODE_PTT ? "ptt" : "vad");

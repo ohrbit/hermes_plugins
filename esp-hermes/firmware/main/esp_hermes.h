@@ -131,6 +131,15 @@ typedef enum {
 #define EH_PIN_SPK_SCK   16
 #define EH_PIN_SPK_SD    17
 
+/* LCD (ST7789, 240x240, SPI) — M5Stack Stick S3 SKU K150. */
+#define EH_PIN_LCD_MOSI  11
+#define EH_PIN_LCD_SCLK  13
+#define EH_PIN_LCD_CS    10
+#define EH_PIN_LCD_DC    12
+#define EH_PIN_LCD_RST   14
+#define EH_LCD_W         240
+#define EH_LCD_H         240
+
 /* Send a raw event to the gateway over the open WS handle. */
 void eh_send_event(esp_websocket_client_handle_t ws, eh_event_t evt);
 
