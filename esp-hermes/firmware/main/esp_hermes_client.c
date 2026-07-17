@@ -40,8 +40,6 @@
 
 static const char *TAG = "esp_hermes_client";
 
-#define EH_WIFI_CONNECTED_BIT BIT0
-static EventGroupHandle_t s_wifi_event_group;
 static esp_websocket_client_handle_t s_ws = NULL;
 eh_mode_t s_mode = EH_MODE_PTT;
 
@@ -108,39 +106,6 @@ static void eh_viz_task(void *arg)
     }
 }
 
-static void wifi_event_handler(void *arg, esp_event_base_t base,
-                               int32_t id, void *data)
-{
-    if (base == WIFI_EVENT && id == WIFI_EVENT_STA_START)
-        esp_wifi_connect();
-    else if (base == WIFI_EVENT && id == WIFI_EVENT_STA_DISCONNECTED) {
-        ESP_LOGW(TAG, "wifi disconnected, retrying");
-        esp_wifi_connect();
-    } else if (base == IP_EVENT && id == IP_EVENT_STA_GOT_IP)
-        xEventGroupSetBits(s_wifi_event_group, EH_WIFI_CONNECTED_BIT);
-}
-
-static void wifi_init_sta(const char *ssid, const char *pass)
-{
-    s_wifi_event_group = xEventGroupCreate();
-    ESP_ERROR_CHECK(esp_netif_init());
-    ESP_ERROR_CHECK(esp_event_loop_create_default());
-    esp_netif_create_default_wifi_sta();
-    wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
-    ESP_ERROR_CHECK(esp_wifi_init(&cfg));
-    esp_event_handler_instance_t inst;
-    ESP_ERROR_CHECK(esp_event_handler_instance_register(
-        WIFI_EVENT, ESP_EVENT_ANY_ID, &wifi_event_handler, NULL, &inst));
-    ESP_ERROR_CHECK(esp_event_handler_instance_register(
-        IP_EVENT, IP_EVENT_STA_GOT_IP, &wifi_event_handler, NULL, &inst));
-    wifi_config_t wcfg = {0};
-    strncpy((char *)wcfg.sta.ssid, ssid, sizeof(wcfg.sta.ssid) - 1);
-    strncpy((char *)wcfg.sta.password, pass, sizeof(wcfg.sta.password) - 1);
-    ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
-    ESP_ERROR_CHECK(esp_wifi_set_config(WIFI_IF_STA, &wcfg));
-    ESP_ERROR_CHECK(esp_wifi_start());
-    ESP_LOGI(TAG, "wifi_init_sta: connecting to %s", ssid);
-}
 
 static void ws_event_handler(void *h, esp_event_base_t base,
                              int32_t id, void *event_data)
@@ -193,7 +158,10 @@ void app_main(void)
     if (!have_wifi) {
         /* Provisioning mode: SoftAP + internal web config server. */
         ESP_LOGI(TAG, "No WiFi configured -> provisioning mode (SoftAP + web UI)");
-        wifi_manager_config_t wcfg = { .ap_ssid_prefix = "esp-hermes", .ap_behavior = "keep" };
+        wifi_manager_config_t wcfg = {
+            .ap_ssid_prefix = "esp-hermes",
+            .ap_behavior = "keep",
+        };
         ESP_ERROR_CHECK(wifi_manager_start(&wcfg));
         ESP_ERROR_CHECK(eh_web_config_start());
         /* Captive portal: redirect all DNS to our UI. */
@@ -204,13 +172,14 @@ void app_main(void)
         };
         captive_dns_start(&cdns);
         /* Stay in provisioning until the user saves WiFi via the UI
-         * (web_config POST applies STA config + restarts). */
-        xEventGroupWaitBits(s_wifi_event_group, EH_WIFI_CONNECTED_BIT,
-                            pdFALSE, pdTRUE, portMAX_DELAY);
-    } else {
-        ESP_ERROR_CHECK(eh_web_config_start());   /* also reachable on STA iface */
+         * (web_config POST applies STA config + restarts the chip). */
+        ESP_LOGI(TAG, "Provisioning UI live at http://192.168.4.1");
+        vTaskDelay(portMAX_DELAY);
+        return;
     }
 
+    /* STA mode: connect to configured WiFi, then bring up the web UI on the
+     * STA interface too (so the user can reconfigure / switch backend). */
     wifi_manager_config_t wcfg = {
         .sta_ssid = cfg.wifi_ssid,
         .sta_password = cfg.wifi_pass[0] ? cfg.wifi_pass : NULL,
@@ -218,8 +187,8 @@ void app_main(void)
         .ap_behavior = "keep",
     };
     ESP_ERROR_CHECK(wifi_manager_start(&wcfg));
-    xEventGroupWaitBits(s_wifi_event_group, EH_WIFI_CONNECTED_BIT,
-                        pdFALSE, pdTRUE, portMAX_DELAY);
+    ESP_ERROR_CHECK(wifi_manager_wait_connected(portMAX_DELAY));
+    ESP_ERROR_CHECK(eh_web_config_start());
 
     /* Backend selection: Hermes Gateway vs local Claw. */
     if (strcmp(cfg.backend, "hermes") == 0) {

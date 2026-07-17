@@ -97,7 +97,7 @@ esp_err_t eh_lcd_pet_set_frame(eh_pet_state_t state,
                                const uint8_t *rgb565, size_t len) {
     if (!s_init || state > EH_PET_STRETCH) return ESP_ERR_INVALID_ARG;
     if (len != EH_PET_FRAME_BYTES) return ESP_ERR_INVALID_SIZE;
-    if (!s_frames[state]) s_frames[state] = heap_caps_malloc(len, MALLOC_CAP_SPIRAM);
+    if (!s_frames[state]) s_frames[state] = heap_caps_malloc(len, MALLOC_CAP_DEFAULT);
     if (!s_frames[state]) return ESP_ERR_NO_MEM;
     memcpy(s_frames[state], rgb565, len);
     return ESP_OK;

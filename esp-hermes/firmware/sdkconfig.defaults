@@ -11,8 +11,10 @@ CONFIG_ESPTOOLPY_FLASHSIZE_8MB=y
 # Keep the string in sync (derived from the choice above).
 CONFIG_ESPTOOLPY_FLASHSIZE="8MB"
 
-# --- PSRAM (Stick S3 = 8MB, needed for audio buffers + video bursts) ---
-CONFIG_SPIRAM=y
+# --- PSRAM (Stick S3 PICO-1: embedded PSRAM currently fails to probe on this
+#     unit; disable until line-mode sorted. Internal RAM used for framebuffers.) ---
+# CONFIG_SPIRAM is intentionally OFF for now.
+CONFIG_SPIRAM=n
 
 # --- WebSocket over TLS (early bring-up: insecure behind tunnel) ---
 # NOTE (spec §17): in production set this to n and pin the gateway cert.

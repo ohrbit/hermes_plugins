@@ -20,7 +20,8 @@ void io_tools_init(void) {
     int def[] = EH_ALLOWED_PINS_DEFAULT;
     memcpy(s_allowed, def, sizeof(def));
     s_allowed_n = EH_ALLOWED_PINS_COUNT;
-    ledc_fade_func_install(0);
+    /* NOTE: ledc_fade_func_install() panics on this S3 unit (v6 HAL); fade is
+       unused for now, so skip it. Can revisit if we add LED breathing. */
 }
 
 static bool pin_allowed(int pin) {

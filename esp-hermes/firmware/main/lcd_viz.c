@@ -52,7 +52,7 @@ static void clear_viz(void) {
 
 void eh_lcd_viz_init(void) {
     if (s_viz) return;
-    s_viz = heap_caps_malloc(VIZ_W * VIZ_H * 2, MALLOC_CAP_SPIRAM);
+    s_viz = heap_caps_malloc(VIZ_W * VIZ_H * 2, MALLOC_CAP_DEFAULT);
     if (!s_viz) { ESP_LOGE(TAG, "viz alloc failed"); return; }
     memset(s_wave, 0, sizeof(s_wave));
     for (int i = 0; i < NBANDS; i++) s_band[i] = 0;
