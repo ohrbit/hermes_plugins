@@ -4,6 +4,7 @@
  */
 #include "imu_motion.h"
 #include "driver/i2c.h"
+#include "esp_websocket_client.h"
 #include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"

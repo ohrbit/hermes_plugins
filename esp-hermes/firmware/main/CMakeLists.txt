@@ -24,6 +24,11 @@ idf_component_register(
         esp-tls
         esp_adc
         fatfs
+        espressif__cjson
+        esp_websocket_client
+        esp_driver_ledc
+        esp_driver_i2c
+        esp_driver_uart
 )
 
 # Audio codec (Opus vs PCM) — spec §11. Default PCM (no external lib yet).

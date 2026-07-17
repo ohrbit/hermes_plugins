@@ -4,6 +4,8 @@
  */
 #include "esp_hermes.h"
 #include <string.h>
+#include <stdio.h>
+#include "esp_websocket_client.h"
 
 /* ---- pin safety (spec §8) ------------------------------------------------ */
 static const int EH_BLOCKED[] = EH_BLOCKED_PINS_DEFAULT;
@@ -113,4 +115,15 @@ int eh_build_ws_url(char *buf, size_t buflen,
                      gateway_host, EH_WS_PATH, device_id, tok);
     if (n < 0 || (size_t)n >= buflen) return -1;
     return n;
+}
+
+/* ---- event send (STUB: minimal JSON, no ACK handling) -------------------- */
+void eh_send_event(esp_websocket_client_handle_t ws, eh_event_t evt) {
+    if (!ws) return;
+    char msg[64];
+    int n = snprintf(msg, sizeof(msg),
+                     "{\"type\":\"event\",\"event\":\"%s\"}",
+                     eh_event_str(evt));
+    if (n > 0)
+        esp_websocket_client_send_text(ws, msg, n, pdMS_TO_TICKS(500));
 }

@@ -22,6 +22,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include "cJSON.h"
+#include "esp_websocket_client.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -118,11 +119,27 @@ typedef enum {
 #define EH_BLOCKED_PINS_DEFAULT { 0, 1, 2, 3, 45, 46 }  /* GPIO0/1/2/3 + straps */
 #define EH_BLOCKED_PINS_COUNT   6
 
+/* Board pin map (M5Stack Stick S3, SKU K150 — verified m5-docs). */
+#define EH_PIN_IMU_SDA   47
+#define EH_PIN_IMU_SCL   48
+#define EH_PIN_KEY1      37
+#define EH_PIN_KEY2      38
+#define EH_PIN_MIC_WS    8
+#define EH_PIN_MIC_SCK   9
+#define EH_PIN_MIC_SD    10
+#define EH_PIN_SPK_WS    15
+#define EH_PIN_SPK_SCK   16
+#define EH_PIN_SPK_SD    17
+
+/* Send a raw event to the gateway over the open WS handle. */
+void eh_send_event(esp_websocket_client_handle_t ws, eh_event_t evt);
+
 /* Result of an IO tool execution on-device. */
 typedef struct {
     bool      ok;
-    int32_t   value;     /* numeric result (level/mV/bytes) or 0 */
-    char      error[48]; /* human readable on failure */
+    int32_t   value;       /* numeric result (level/mV/bytes) or 0 */
+    char      value_str[64]; /* textual result (e.g. "ax,ay,az") when value<0 */
+    char      error[48];   /* human readable on failure */
 } eh_tool_result_t;
 
 /* ---------------------------------------------------------------------------

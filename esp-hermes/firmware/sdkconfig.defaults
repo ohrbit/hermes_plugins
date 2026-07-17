@@ -6,6 +6,9 @@ CONFIG_IDF_TARGET="esp32s3"
 # --- Flash size (CRITICAL: Stick S3 has 8MB, default is 2MB) ---
 CONFIG_PARTITION_TABLE_CUSTOM=y
 CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions.csv"
+# Flash size is a Kconfig *choice* — must set the bool symbol, not the string.
+CONFIG_ESPTOOLPY_FLASHSIZE_8MB=y
+# Keep the string in sync (derived from the choice above).
 CONFIG_ESPTOOLPY_FLASHSIZE="8MB"
 
 # --- PSRAM (Stick S3 = 8MB, needed for audio buffers + video bursts) ---

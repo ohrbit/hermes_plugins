@@ -8,8 +8,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include "esp_hermes.h"
+#include "esp_websocket_client.h"
 
 #define EH_IMU_I2C_PORT    I2C_NUM_0
+#define EH_I2C_IMU_ADDR    0x68
 #define EH_IMU_SAMPLE_HZ   50
 #define EH_SHAKE_THRESH    2.5f
 #define EH_FLIP_THRESH     0.7f
